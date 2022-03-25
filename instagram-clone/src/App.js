@@ -1,25 +1,20 @@
-import React, { useState } from 'react';
+import React, {useState, useEffect} from 'react';
 import './App.css';
-import Post from './Post'
+import Post from './Post';
+import { db } from './firebase';
+import { collection, getDocs } from 'firebase/firestore';
 
 function App() {
-  const [posts, setPosts] = useState([
-    {
-      username: "Henok", 
-      caption: "It works", 
-      imageUrl: "https://p.bigstockphoto.com/GeFvQkBbSLaMdpKXF1Zv_bigstock-Aerial-View-Of-Blue-Lakes-And--227291596.jpg"
-    },
-    {
-      username: "Girum", 
-      caption: "Scary shit", 
-      imageUrl: "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg"
-    },
-    {
-      username: "Dag", 
-      caption: "I love plants", 
-      imageUrl: "https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg"
-    }
-  ]);
+
+  const [posts, setPosts] = useState ([]);
+  useEffect(() => {
+    const getPosts = async () => {
+      const data = await getDocs(collection(db, "posts"));
+      setPosts(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+    };
+    getPosts();
+  });
+
   return (
     <div className="app">
       <div className="app__header">
@@ -31,13 +26,14 @@ function App() {
       </div>
 
       <h1>Hello, This is an instagram clone built using React.js</h1>
-      
-      {
-        posts.map(post => (
-          <Post username={post.username} caption={post.caption} imageUrl={post.imageUrl}/>
-        ))
-      }
-
+        {
+          posts.map(post => (
+            <Post username={post.username} caption={post.caption}
+            imageUrl={post.imageUrl} 
+            />
+          ))
+        }
+         
     </div>
   );
 }
